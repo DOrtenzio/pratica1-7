@@ -32,7 +32,7 @@ $obj=new Operazioni("localhost","dortenzio_biblioteca","root","");
                 <label for="id_libro">Assegna Libro</label>
                 <select id="id_libro" name="id_libro" required>
                     <?php
-                        foreach($obj->query("utenti") as $l) echo "<option value='".$l["id_libro"]."'>".$l["titolo"]."</option>";
+                        foreach($obj->query("libri") as $l) echo "<option value='".$l["id_libro"]."'>".$l["titolo"]."</option>";
                     ?>
                 </select>
             </div>
