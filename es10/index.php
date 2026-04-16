@@ -1,5 +1,6 @@
 <?php
 require_once("funzioni/operazioni.php");
+if(session_status()!==PHP_SESSION_ACTIVE) session_start();
 
 $obj=null;
 try{
@@ -24,6 +25,36 @@ try{
         button, input[type="submit"] { cursor: pointer; padding: 5px 10px; }
         .btn-add { background: #28a745; color: white; border: none; padding: 10px 15px; text-decoration: none; border-radius: 4px; }
         .btn { background: #f4f4f4; color: black; border: none; padding: 10px 15px; text-decoration: none; border-radius: 4px; }
+        .toolbar { 
+            display: flex; 
+            align-items: center; 
+            gap: 15px; 
+            background: #fff; 
+            padding: 15px; 
+            border-radius: 8px; 
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .separator {
+            width: 1px;
+            height: 30px;
+            background-color: #ddd;
+            margin: 0 10px;
+        }
+        .toolbar form {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 0;
+        }
+        .btn-filter {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -31,17 +62,19 @@ try{
     <h1>Gestione Prestiti</h1>
     <p>Benvenuto/a</p>
 
-    <div style="margin-bottom: 20px;">
+    <div class="toolbar">
         <a href="funzioni/inserimento.php" class="btn-add">+ Nuovo Prestito</a>
         <a href="funzioni/inserimento_libro.php" class="btn-add">+ Nuovo Libro</a>
+        <div class="separator"></div>
         <form action="funzioni/filtra.php" method="post">
-        <select class="btn-add" name="filtro_utente">
-            <option value="all">Vedi Tutto</option>
-            <?php foreach($obj->query("utenti") as $u) echo "<option value='".$u["id_utenti"]."'>".$u["email"]."</option>"; ?>
-            <input type="submit" value="Filtra" name="Filtra">
-        </select>
+            <select name="filtro_utente">
+                <option value="all">Vedi Tutto</option>
+                <?php foreach($obj->query("utenti") as $u) echo "<option value='".$u["id_utente"]."'>".$u["email"]."</option>"; ?>
+            </select>
+            <input type="submit" value="Filtra" name="Filtra" class="btn-filter">
         </form>
     </div>
+
 
     <table>
         <thead>
@@ -57,10 +90,10 @@ try{
             <?php
             try {
                 $utenti_assoc = [];
-                foreach($obj->query("utenti") as $u) { $utenti_assoc[$u["id_utenti"]] = $u; }
+                foreach($obj->query("utenti") as $u) { $utenti_assoc[$u["id_utente"]] = $u; }
 
                 $libr_assoc = [];
-                foreach($obj->query("libri") as $l) { $libr_assoc[$c["id_libro"]] = $l; }
+                foreach($obj->query("libri") as $l) { $libr_assoc[$l["id_libro"]] = $l; }
 
                 foreach($obj->query("prestiti") as $prestiti) {
                     if($_SESSION["filtro_utente"]==="all" || $_SESSION["filtro_utente"]===$prestiti["id_utente"]){
