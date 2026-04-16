@@ -1,6 +1,7 @@
 <?php
 require_once("funzioni/operazioni.php");
 if(session_status()!==PHP_SESSION_ACTIVE) session_start();
+if(!isset($_SESSION["filtro_utente"]))  $_SESSION["filtro_utente"]="all";
 
 $obj=null;
 try{
@@ -99,11 +100,9 @@ try{
                     if($_SESSION["filtro_utente"]==="all" || $_SESSION["filtro_utente"]===$prestiti["id_utente"]){
                         $checked = ($prestiti["restituito"] == 1) ? "checked" : "";
                         $stato = ($prestiti["restituito"] == 1) ? "Retituito" : "Non Restituito";
-                        
                         echo "<tr>";
-                        echo "<td><strong>" .$prestiti[""]. "</strong></td>";
-                        echo "<td>" .$utenti_assoc[$prestiti["id_libro"]]["titolo"]. "</td>";
-                        echo "<td>" .$libr_assoc[$prestiti["id_utente"]]["email"]. "</td>";
+                        echo "<td>" .$libr_assoc[$prestiti["id_libro"]]["titolo"]. "</td>";
+                        echo "<td>" .$utenti_assoc[$prestiti["id_utente"]]["email"]. "</td>";
                         echo "<td>" .$prestiti["data_inizio"]."</td>";
                         echo "<td>" .$prestiti["data_fine_prevista"]."</td>";
                         echo "<td><input type='checkbox' $checked disabled> $stato</td>";
