@@ -97,7 +97,7 @@ try{
                 foreach($obj->query("libri") as $l) { $libr_assoc[$l["id_libro"]] = $l; }
 
                 foreach($obj->query("prestiti") as $prestiti) {
-                    if($_SESSION["filtro_utente"]==="all" || $_SESSION["filtro_utente"]===$prestiti["id_utente"]){
+                    if($_SESSION["filtro_utente"]==="all" || $_SESSION["filtro_utente"]==$prestiti["id_utente"]){
                         $checked = ($prestiti["restituito"] == 1) ? "checked" : "";
                         $stato = ($prestiti["restituito"] == 1) ? "Retituito" : "Non Restituito";
                         echo "<tr>";

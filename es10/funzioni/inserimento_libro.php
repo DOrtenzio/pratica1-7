@@ -1,5 +1,6 @@
 <?php
 require_once("operazioni.php");
+$obj=new Operazioni("localhost","dortenzio_biblioteca","root","");
 ?>
 <!DOCTYPE html>
 <html lang="it">
