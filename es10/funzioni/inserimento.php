@@ -1,6 +1,14 @@
 <?php
 require_once("operazioni.php");
-$obj=new Operazioni("localhost","dortenzio_biblioteca","root","");
+require_once("tok.php");
+require_once("conf.php");
+
+$obj=null;
+try{
+    $obj = new Operazioni($host,$dbname,$user,$psw);
+}catch(Exception $e){
+    header("Location: errorpage.html");
+}
 ?>
 <!DOCTYPE html>
 <html lang="it">
@@ -28,6 +36,7 @@ $obj=new Operazioni("localhost","dortenzio_biblioteca","root","");
         <h1>Aggiungi Nuovo Prestito</h1>
 
         <form action="salva_inserimento.php" method="post">
+        <input type="hidden" name="token" value="<?php echo create_token($_SERVER['REQUEST_URI']); ?>">
             <div class="form-group">
                 <label for="id_libro">Assegna Libro</label>
                 <select id="id_libro" name="id_libro" required>

@@ -1,11 +1,14 @@
 <?php
 require_once("funzioni/operazioni.php");
+require_once("funzioni/tok.php");
+require_once("funzioni/conf.php");
+
 if(session_status()!==PHP_SESSION_ACTIVE) session_start();
 if(!isset($_SESSION["filtro_utente"]))  $_SESSION["filtro_utente"]="all";
 
 $obj=null;
 try{
-    $obj = new Operazioni("localhost", "dortenzio_biblioteca", "root", "");
+    $obj = new Operazioni($host,$dbname,$user,$psw);
 }catch(Exception $e){
     header("Location: errorpage.html");
 }
@@ -108,12 +111,9 @@ try{
                         echo "<td><input type='checkbox' $checked disabled> $stato</td>";
                         if($prestiti["restituito"] == 0){
                             echo "<td class='actions'>
-                                <form action='funzioni/salva_update.php' method='post'>
-                                    <input type='hidden' name='id_prestito' value='".$prestiti["id_prestito"]."'>
-                                    <input type='hidden' name='id_libro' value='".$prestiti["id_libro"]."'>
-                                    <input type='hidden' name='id_utente' value='".$prestiti["id_utente"]."'>
-                                    <input type='hidden' name='data_inizio' value='".$prestiti["data_inizio"]."'>
-                                    <input type='hidden' name='data_fine_prevista' value='".$prestiti["data_fine_prevista"]."'>
+                                <form action='funzioni/salva_update.php' method='post' id='formRest'>
+                                    <input type='hidden' name='token' value='".create_token($_SERVER['REQUEST_URI'])."'>
+                                    <input type='hidden' name='id_prestito' value='".$prestiti["id_prestito"]."'> 
                                     <input type='hidden' name='restituito' value='".$prestiti["restituito"]."'>
                                     <input type='submit' value='Restituisci' name='Restituisci'>
                                 </form>
@@ -127,9 +127,16 @@ try{
             } catch(Exception $e) {
                 echo "<tr><td colspan='5' style='color:red;'>Errore nel caricamento dati.</td></tr>";
             }
+
             ?>
         </tbody>
     </table>
+    <script>
+        document.getElementById("formRest").addEventListener("submit", function(e) {
+            const conferma = confirm("Confermi l'operazione?");
+            if (!conferma) e.preventDefault();
+        });
+    </script>
 
 </body>
 </html>
