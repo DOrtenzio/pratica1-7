@@ -44,6 +44,16 @@ CREATE TABLE Prestiti (
     FOREIGN KEY (id_utente) REFERENCES Utenti(id_utente) ON DELETE CASCADE
 );
 
+CREATE TABLE tokens (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    token VARCHAR(255) NOT NULL,
+    type VARCHAR(50),
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    revoked BOOLEAN DEFAULT FALSE,
+    
+    UNIQUE (token)
+);
+
 -- ==========================================================
 -- 2. INSERIMENTO TUPLE 
 -- ==========================================================

@@ -36,7 +36,7 @@ try{
         <h1>Aggiungi Nuovo Libro</h1>
 
         <form action="salva_inserimento.php" method="post">
-            <input type="hidden" name="token" value="<?php echo create_token($_SERVER['REQUEST_URI']); ?>">
+            <input type="hidden" name="token" value="<?php echo create_token(); ?>">
             <div class="form-group">
                 <label for="titolo">Titolo </label>
                 <input type="text" id="titolo" name="titolo" placeholder="Il Nome della Rosa" required>

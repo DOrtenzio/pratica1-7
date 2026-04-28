@@ -112,7 +112,7 @@ try{
                         if($prestiti["restituito"] == 0){
                             echo "<td class='actions'>
                                 <form action='funzioni/salva_update.php' method='post' id='formRest'>
-                                    <input type='hidden' name='token' value='".create_token($_SERVER['REQUEST_URI'])."'>
+                                    <input type='hidden' name='token' value='".create_token()."'>
                                     <input type='hidden' name='id_prestito' value='".$prestiti["id_prestito"]."'> 
                                     <input type='hidden' name='restituito' value='".$prestiti["restituito"]."'>
                                     <input type='submit' value='Restituisci' name='Restituisci'>

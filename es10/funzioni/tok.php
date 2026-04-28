@@ -1,31 +1,34 @@
 <?php
-/*
-CREATE TABLE tokens (
-    id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    token VARCHAR(255) NOT NULL,
-    type VARCHAR(50),
-    expires_at DATETIME,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    revoked BOOLEAN DEFAULT FALSE,
-    
-    UNIQUE (token)
-);
-*/
 
 require_once("operazioni.php");
-function create_token($page): string{
+function create_token(){
     require_once("conf.php");
 
     try{
         $obj = new Operazioni($host,$dbname,$user,$psw);
-        $
+        $token=bin2hex(random_bytes(10));
+        $obj->insert("tokens",[
+            "token"=>password_hash($token,PASSWORD_DEFAULT),
+            "type"=> "operation"]);
+        return $token;
     }catch(Exception $e){
         header("Location: errorpage.html");
     }
-    $arr=explode("/",$page);
-    return $arr[count($arr)-1].":".password_hash("secret",PASSWORD_DEFAULT);
 }
 
-function verify_token($page,$hash): bool{
-    return in_array($page,["index.php","inserimento.php","inserimento_libro.php"]) && password_verify("secret",$hash);
+function verify_token($token){
+    require_once("conf.php");
+
+    try{
+        $obj = new Operazioni($host,$dbname,$user,$psw);
+        foreach($obj->query("tokens") as $tok){
+            if(password_verify($tok["token"],$token) && time()>(strtotime($tok["created_at"])+15)){
+                $obj->delete("tokens",["token"=>$tok["token"]]);
+                return true;
+            }
+        }
+        return false;
+    }catch(Exception $e){
+        header("Location: errorpage.html");
+    }
 }

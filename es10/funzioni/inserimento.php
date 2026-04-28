@@ -36,7 +36,7 @@ try{
         <h1>Aggiungi Nuovo Prestito</h1>
 
         <form action="salva_inserimento.php" method="post">
-        <input type="hidden" name="token" value="<?php echo create_token($_SERVER['REQUEST_URI']); ?>">
+        <input type="hidden" name="token" value="<?php echo create_token(); ?>">
             <div class="form-group">
                 <label for="id_libro">Assegna Libro</label>
                 <select id="id_libro" name="id_libro" required>
