@@ -1,7 +1,7 @@
 <?php
 class Operazioni{
     private PDO $conn;
-    private array $whitelist=["prestiti","utenti","libri","autori"];
+    private array $whitelist=["prestiti","utenti","libri","autori","token"];
 
     function __construct($host,$dbname,$user,$psw){
         try{
