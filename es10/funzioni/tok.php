@@ -6,7 +6,7 @@ function create_token(){
         $token=bin2hex(random_bytes(10));
         $obj->insert("tokens",[
             "token"=>password_hash($token,PASSWORD_DEFAULT),
-            "type"=> "operation"]);
+            "type"=> $token]);
         return $token;
     }catch(Exception $e){
         header("Location: ../errorpage.html");
@@ -14,8 +14,6 @@ function create_token(){
 }
 
 function verify_token($token){
-    return true;
-    /*
     try{
         $obj = new Operazioni();
         foreach($obj->query("tokens") as $tok){
@@ -27,5 +25,5 @@ function verify_token($token){
         return false;
     }catch(Exception $e){
         header("Location: ../errorpage.html");
-    }*/
+    }
 }
