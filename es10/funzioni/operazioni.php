@@ -14,50 +14,55 @@ class Operazioni{
         }
     }
 
-    function query($table): array{
-        if(!in_array($table,$this->whitelist)) throw new Exception("Tabella non trovata");
-        $stmt=$this->conn->prepare("SELECT * FROM `$table`");
-        $stmt->execute();
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
-
-    function query_where($table,$arr_id){
-        if(!in_array($table,$this->whitelist)) throw new Exception("Tabella non trovata");
-        if(!is_array($arr_id)) throw new Exception("Dati non validi");
-
-        $valori=[];
-        foreach($arr_id as $k=>$v) $valori[":w_$k"]=$v;
-
-        $sql="SELECT * FROM `$table` WHERE ";
-        foreach($arr_id as $k=>$v){
-            $sql=$sql."$k=:w_$k AND";
+    function query($table,$where=[],$groupBy=[],$having=[],$orderBy=[],$select=['*']){
+        if(!in_array($table, $this->whitelist)) throw new Exception("Tabella non trovata");
+        
+        $valori = [];
+    
+        // SELECT
+        $sql = "SELECT ".implode(",", array_map(fn($c) => $c=='*' ? '*' : "`$c`", $select))." FROM `$table`";
+    
+        // WHERE
+        if(!empty($where)) {
+            $sql=$sql." WHERE ";
+            $condizioni_where = [];
+            foreach($where as $k=>$v) {
+                $condizioni_where[]="`$k`=:w_$k";
+                $valori[":w_$k"]=$v;
+            }
+            $sql .= implode(" AND ", $condizioni_where);
         }
-        $sql=substr($sql,0,-3).";";
-
-
-        $stmt=$this->conn->prepare($sql);
-        $stmt->execute($valori);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
-
-    function query_count($table,$arr_id,$arr_groupby){
-        if(!in_array($table,$this->whitelist)) throw new Exception("Tabella non trovata");
-        if(!is_array($arr_id)) throw new Exception("Dati non validi");
-        if(!is_array($arr_groupby)) throw new Exception("Dati non validi");
-
-        $valori=[];
-        foreach($arr_id as $k=>$v) $valori[":w_$k"]=$v;
-
-        $sql="SELECT COUNT(*) as totale FROM `$table` WHERE ";
-        foreach($arr_id as $k=>$v){
-            $sql=$sql."$k=:w_$k AND";
+    
+        // GROUP BY
+        if(!empty($groupBy)) $sql=$sql." GROUP BY ".implode(",", array_map(fn($c) => "`$c`", $groupBy));
+    
+        // HAVING
+        if(!empty($having)) {
+            $sql=$sql." HAVING ";
+            $condizioni_having=[];
+            foreach($having as $k=>$v) {
+                $condizioni_having[] = "`$k`=:h_$k";
+                $valori[":h_$k"] = $v;
+            }
+            $sql .= implode(" AND ", $condizioni_having);
         }
-        $sql=substr($sql,0,-3)." GROUP BY ".implode(",",array_map(fn($k) => "`$k`", $arr_groupby)).";";
-
-
-        $stmt=$this->conn->prepare($sql);
+    
+        // ORDER BY
+        if(!empty($orderBy)) {
+            $orders=[];
+            foreach($orderBy as $k => $dir) {
+                $dir=strtoupper($dir)=='DESC' ? 'DESC' : 'ASC';
+                $orders[]="`$k` $dir";
+            }
+            $sql=$sql." ORDER BY " . implode(",", $orders);
+        }
+    
+        $sql=$sql.";";
+    
+        $stmt = $this->conn->prepare($sql);
         $stmt->execute($valori);
-        return $stmt->fetch(PDO::FETCH_ASSOC);
+    
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
     function insert($table,$arr_att_val){
@@ -80,12 +85,13 @@ class Operazioni{
         $valori = [];
         foreach($arr_att_val as $k => $v) $valori[":v_$k"] = $v;
 
-        $sql = "UPDATE `$table` SET " . implode(", ", array_map(fn($k) => "`$k` = :v_$k", array_keys($arr_att_val))) . " WHERE ";
+        $condizioni=[];
         foreach($arr_id_val as $k => $v) {
-            $sql .= "`$k` = :w_$k AND ";
-            $valori[":w_$k"] = $v;
+            $condizioni[]="`$k`=:w_$k";
+            $valori[":w_$k"]=$v;
         }
-        $sql = substr($sql, 0, -5);
+
+        $sql = "UPDATE `$table` SET " . implode(", ", array_map(fn($k) => "`$k` = :v_$k", array_keys($arr_att_val))) . " WHERE ".implode(" AND ",$condizioni);
 
         $stmt=$this->conn->prepare($sql);
         $stmt->execute($valori);
@@ -98,12 +104,13 @@ class Operazioni{
 
         $valori=[];
 
-        $sql="DELETE FROM `$table` WHERE ";
-        foreach($arr_id_val as $k => $v){
-            $sql=$sql."`$k`=:$k AND";
-            $valori[":$k"]=$v;
+        $condizioni=[];
+        foreach($arr_id_val as $k => $v) {
+            $condizioni[]="`$k`=:w_$k";
+            $valori[":w_$k"]=$v;
         }
-        $sql=substr($sql,0,-4).";";
+
+        $sql="DELETE FROM `$table` WHERE ".implode(" AND ",$condizioni).";";
 
         $stmt=$this->conn->prepare($sql);
         $stmt->execute($valori);
