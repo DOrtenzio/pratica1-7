@@ -16,14 +16,13 @@ function create_token(){
 function verify_token($token){
     try{
         $obj = new Operazioni();
-        $tok=$obj->query("tokens",["token"=>password_hash($token,PASSWORD_DEFAULT)]);
-        if($tok!=false && count($tok)>0){
-            $tok=array_pop($tok);
-            if(time()>(strtotime($tok["created_at"])+15)){
+        foreach($obj->query("tokens") as $tok){
+            if(password_verify($tok["token"],$token) && time()<(strtotime($tok["created_at"])+15)){
                 $obj->delete("tokens",["token"=>$tok["token"]]);
                 return true;
-            } else return false;
-        }else return false;
+            }
+        }
+        return false;
     }catch(Exception $e){
         header("Location: ../errorpage.html");
     }
