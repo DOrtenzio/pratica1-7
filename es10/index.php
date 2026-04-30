@@ -1,14 +1,13 @@
 <?php
 require_once("funzioni/operazioni.php");
 require_once("funzioni/tok.php");
-require_once("funzioni/conf.php");
 
 if(session_status()!==PHP_SESSION_ACTIVE) session_start();
 if(!isset($_SESSION["filtro_utente"]))  $_SESSION["filtro_utente"]="all";
 
 $obj=null;
 try{
-    $obj = new Operazioni($host,$dbname,$user,$psw);
+    $obj = new Operazioni();
 }catch(Exception $e){
     header("Location: errorpage.html");
 }
@@ -51,6 +50,25 @@ try{
             gap: 10px;
             margin: 0;
         }
+        .toolbar a,
+        .toolbar select,
+        .toolbar input[type="submit"] {
+            height: 38px;
+            display: flex;
+            align-items: center;
+            font-size: 14px;
+        }
+
+        .toolbar select {
+            padding: 0 10px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+        }
+
+        .toolbar a {
+            display: flex;
+            align-items: center;
+        }
         .btn-filter {
             background: #6c757d;
             color: white;
@@ -58,6 +76,23 @@ try{
             padding: 8px 12px;
             border-radius: 4px;
             cursor: pointer;
+        }
+        .btn-add, .btn-filter {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            height: 38px;
+        }
+        .actions form input[type="submit"] {
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 6px 10px;
+        }
+        td input[type="checkbox"] {
+            transform: scale(1.2);
+            margin-right: 5px;
         }
     </style>
 </head>
@@ -88,6 +123,7 @@ try{
                 <th>DATA_INIZIO</th>
                 <th>DATA_FINE</th>
                 <th>RESTITUITO</th>
+                <th>AZIONI</th>
             </tr>
         </thead>
         <tbody>

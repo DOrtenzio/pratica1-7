@@ -1,13 +1,12 @@
 <?php
 require_once("operazioni.php");
 require_once("tok.php");
-require_once("conf.php");
 
 $obj=null;
 try{
-    $obj = new Operazioni($host,$dbname,$user,$psw);
+    $obj = new Operazioni();
 }catch(Exception $e){
-    header("Location: errorpage.html");
+    header("Location: ../errorpage.html");
 }
 ?>
 <!DOCTYPE html>
